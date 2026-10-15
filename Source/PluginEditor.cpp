@@ -2,10 +2,12 @@
 #include <cmath>
 
 namespace {
-constexpr auto ink = juce::Colour(0xff1b211f);
-constexpr auto cream = juce::Colour(0xffefdfbc);
-constexpr auto muted = juce::Colour(0xffa6aa9b);
-constexpr auto brass = juce::Colour(0xffc8a56c);
+
+const auto ink = juce::Colour(0xff1b211f);
+const auto cream = juce::Colour(0xffefdfbc);
+const auto muted = juce::Colour(0xffa6aa9b);
+const auto brass = juce::Colour(0xffc8a56c);
+
 }
 
 void ThreeKnobLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
