@@ -1,0 +1,21 @@
+3 KNOB — DSP validation on Linux, 2026-10-15
+
+Two complete local test runs passed (optimized and ASan+UBSan).
+11/11 assertions passed in each run:
+- Zero knobs = bit-exact passthrough
+- Bypass on at preparation = bit-exact passthrough
+- Three controls color audio without NaN/Inf
+- SUN independently changes EQ contour
+- GOLD independently adds nonlinear coloration
+- GLOW changes transient-sensitive harmonics
+- Silence at sample rates 8, 11.025, 44.1, 48, 96, 192, and 384 kHz
+- NaN/Inf input containment
+- Smooth bypass eventually returns to bit-exact passthrough
+- Different host block sizes, mono/stereo, aggressive parameter changes
+- Process audio faster than real-time on the Linux test machine
+
+Optimized benchmark: 25.6 seconds stereo audio processed in 0.065 s (~395x realtime).
+Sanitized benchmark: 25.6 seconds stereo audio processed in 0.278 s (~92x realtime).
+
+LIMITATION: This does not prove native macOS AU compilation, Audio Unit host validation,
+or Logic Pro playback. These require an actual Mac running Xcode and Logic.

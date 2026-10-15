@@ -1,0 +1,21 @@
+3 KNOB by Leo Gallagher — macOS Monterey / low disk space
+
+OPTION A: NO XCODE OR COMPILERS ON YOUR MAC (recommended)
+
+1. Extract this project ZIP.
+2. Make a GitHub repo: https://github.com/new
+3. Repo > Add file > Upload files; drag the extracted folder's CONTENTS
+   into browser. Check that .github/workflows/build-3-knob.yml is present.
+4. Repo > Actions > Build 3 KNOB for macOS Intel. Wait for the green check.
+5. Download the build artifact; unpack both ZIP layers to find 3 KNOB.component.
+6. Copy 3 KNOB.component into ~/Library/Audio/Plug-Ins/Components/
+7. Restart Logic > Audio FX > Audio Units > Leo Gallagher > 3 KNOB.
+
+OPTION B: BUILD LOCALLY WITHOUT FULL XCODE
+
+1. Install Apple Command Line Tools: xcode-select --install
+2. Install CMake >= 3.22 suitable for Monterey.
+3. Double click build-mac.command.
+
+This ZIP is source code, not the compiled .component. Neither Mac build route
+has been validated by the authoring environment; see README.md for details.
