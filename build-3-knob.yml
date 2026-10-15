@@ -1,0 +1,56 @@
+name: Build 3 KNOB for macOS Intel
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-au:
+    name: Build and package Audio Unit
+    runs-on: macos-15-intel
+    permissions:
+      contents: read
+    steps:
+      - name: Get source code
+        uses: actions/checkout@v4
+
+      - name: Verify tools and DSP tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          cmake --version
+          clang++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror Tests/test_engine.cpp -o /tmp/three-knob-dsp-test
+          /tmp/three-knob-dsp-test
+
+      - name: Build Intel AU (compatible target macOS 10.15+)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build-cloud -G Xcode \
+            -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+          cmake --build build-cloud --config Release --target ThreeKnob_AU --parallel 2
+
+      - name: Ad-hoc sign and package AU component
+        shell: bash
+        run: |
+          set -euo pipefail
+          COMPONENT="$(find build-cloud -type d -name '3 KNOB.component' -print -quit)"
+          if [[ -z "$COMPONENT" ]]; then echo 'Missing AU component'; exit 1; fi
+          codesign --force --deep --sign - "$COMPONENT"
+          ditto -c -k --sequesterRsrc --keepParent "$COMPONENT" "$RUNNER_TEMP/3-KNOB-macOS-Intel.zip"
+          mkdir -p "$HOME/Library/Audio/Plug-Ins/Components"
+          ditto "$COMPONENT" "$HOME/Library/Audio/Plug-Ins/Components/3 KNOB.component"
+          if command -v auval >/dev/null 2>&1; then
+            echo 'Attempting macOS Audio Unit validation (may be limited on a headless runner):'
+            auval -v aufx Knob Lega || echo 'Note: auval did not pass on this runner; verify in Logic on your own Mac.'
+          fi
+
+      - name: Make the finished AU available to download
+        uses: actions/upload-artifact@v4
+        with:
+          name: 3-KNOB-by-Leo-Gallagher-macOS-Intel
+          path: ${{ runner.temp }}/3-KNOB-macOS-Intel.zip
+          retention-days: 14
+          if-no-files-found: error
